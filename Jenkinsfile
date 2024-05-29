@@ -210,7 +210,7 @@ def agentLabel = "${env.JENKINS_AGENT == null ? "":env.JENKINS_AGENT}"
 pipeline {
   agent { label agentLabel }
   environment {
-    DEFAULT_STAGE_SEQ = "'Initialization','Build','UnitTests','SonarQubeScan','BuildContainerImage','containerImageScan','artifactPublish','PublishContainerImage','Deploy','FunctionalTests','Destroy'"
+    DEFAULT_STAGE_SEQ = "'Initialization','Build','UnitTests','SonarQubeScan','BuildContainerImage','containerImageScan','publishArtifact','PublishContainerImage','Deploy','FunctionalTests','Destroy'"
     CUSTOM_STAGE_SEQ = "${DYNAMIC_JENKINS_STAGE_SEQUENCE}"
     PROJECT_TEMPLATE_ACTIVE = "${DYNAMIC_JENKINS_STAGE_NEEDED}"
     LIST = "${env.PROJECT_TEMPLATE_ACTIVE == 'true' ? env.CUSTOM_STAGE_SEQ : env.DEFAULT_STAGE_SEQ}"
@@ -264,7 +264,7 @@ pipeline {
             env.REPO_NAME = metadataVars.repoName
             env.ARTIFACTORY_URL = metadataVars.artifactoryUrl
             repoProperties = parseJsonString(env.JENKINS_METADATA,'general')
-            if(metadataVars.artifactPath){
+            if( metadataVars.artifactRepository){
                 artifactPathMetadata = parseJsonString(repoProperties,'artifactRepository')
                 artifactPathVars = parseJsonArray(artifactPathMetadata)
                 env.LIBRARY_REPO = artifactPathVars.release
@@ -410,7 +410,7 @@ pipeline {
                     stage('Publish Artifact') {
                            withCredentials([usernamePassword(credentialsId: "$ARTIFACTORY_CREDENTIALS", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                           sh """
-                          docker run --rm  -v "$WORKSPACE":/opt/"$REPO_NAME" -w /opt/"$REPO_NAME" "$JFROG_CLI_IMAGE" /bin/bash -c "jf c add jfrog --password $PASSWORD --user $USERNAME --url="$ARTIFACTORY_URL" --artifactory-url="$ARTIFACTORY_URL"/artifactory --interactive=false --overwrite=true ; jf npm-config --repo-deploy "$ARTIFACT_PATH" ; npm install ; jf npm publish"  """
+                          docker run --rm  -v "$WORKSPACE":/opt/"$REPO_NAME" -w /opt/"$REPO_NAME" "$JFROGCLI_IMAGE_VERSION" /bin/bash -c "jf c add jfrog --password "$PASSWORD" --user "$USERNAME" --url="$ARTIFACTORY_URL" --artifactory-url="$ARTIFACTORY_URL"/artifactory --interactive=false --overwrite=true ; jf npm-config --repo-deploy "$LIBRARY_REPO" ; npm install ; jf npm publish"  """
                         }
                     }
                } else if ("${list[i]}" == "'BuildContainerImage'" && env.ACTION == 'DEPLOY' && "$PUBLISH_ARTIFACT" == "false") {
