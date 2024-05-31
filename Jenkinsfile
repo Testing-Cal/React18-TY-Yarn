@@ -410,7 +410,7 @@ pipeline {
                     stage('Publish Artifact') {
                            withCredentials([usernamePassword(credentialsId: "$ARTIFACTORY_CREDENTIALS", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                           sh """
-                          docker run --rm  -v "$WORKSPACE":/opt/"$REPO_NAME" -w /opt/"$REPO_NAME" "$JFROGCLI_IMAGE_VERSION" /bin/bash -c "jf c add jfrog --password "$PASSWORD" --user "$USERNAME" --url="$ARTIFACTORY_URL" --artifactory-url="$ARTIFACTORY_URL"/artifactory --interactive=false --overwrite=true ; jf npm-config --repo-deploy "$LIBRARY_REPO" ; npm install ; jf npm publish"  """
+                          docker run --rm  -v "$WORKSPACE":/opt/"$REPO_NAME" -w /opt/"$REPO_NAME" "$JFROGCLI_IMAGE_VERSION" /bin/bash -c "jf c add jfrog --password "$PASSWORD" --user "$USERNAME" --url="$ARTIFACTORY_URL" --artifactory-url="$ARTIFACTORY_URL"/artifactory --interactive=false --overwrite=true ; jf npm-config --repo-deploy "$LIBRARY_REPO" --server-id-deploy jfrog; npm install ; jf npm publish"  """
                         }
                     }
                } else if ("${list[i]}" == "'BuildContainerImage'" && env.ACTION == 'DEPLOY' && "$PUBLISH_ARTIFACT" == "false") {
