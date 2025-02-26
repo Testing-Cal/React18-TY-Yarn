@@ -58,16 +58,20 @@ jobs:
 
       - name: Unit Test
         run: |
-          docker run --rm -v "$GITHUB_WORKSPACE":/opt/repo -w /opt/repo $JAVA_MVN_IMAGE_VERSION ./mvnw test --batch-mode
-
+          docker run --rm --user root -v "$WORKSPACE":/opt/repo -w /opt/repo $NODE_IMAGE /bin/bash -c "cd /opt/repo && yarn install && yarn test -- --coverage --watchAll=false && yarn run test:coverage"
+      
       - name: Build
         run: |
-          docker run --rm -v "$GITHUB_WORKSPACE":/opt/repo -w /opt/repo $JAVA_MVN_IMAGE_VERSION ./mvnw clean install -Dmaven.test.skip=true
-
+          echo "no build"
 
       - name: SonarQube Scan
         run: |
-          docker run -v "$GITHUB_WORKSPACE":/app -w /app "$SONAR_IMAGE_VERSION" -Dsonar.java.binaries='.' -Dsonar.exclusions='pom.xml, target/**/*' -Dsonar.projectKey="$sonar_project_key" -Dsonar.projectName="$sonar_project_key" -Dsonar.sources=src -Dsonar.host.url="$sonar_host" -Dsonar.organization="$sonar_org" -Dsonar.login=${{ secrets.TENANT950174_336451CB_B0FC_45E9_9F6E_D3F1E4704A3B_SONAR}} -Dsonar.token=${{ secrets.TENANT950174_336451CB_B0FC_45E9_9F6E_D3F1E4704A3B_SONAR}}
+         
+          sed -i s+#SONAR_URL#+"${{ secrets.TENANT950174_336451CB_B0FC_45E9_9F6E_D3F1E4704A3B_SONAR }}"+g ./sonar-project.properties
+          sed -i s+#SONAR_LOGIN#+$PASSWORD+g ./sonar-project.properties
+          sed -i s+#RELEASE_NAME#+"$sonar_project_key"+g ./sonar-project.properties
+          sed -i s+#SONAR_ORGANIZATION#+"$sonar_org"+g ./sonar-project.properties
+          docker run --rm --user root -v "$WORKSPACE":/opt/repo -w /opt/repo $NODE_IMAGE /bin/bash -c "chown -R root:root /opt/repo && yarn add sonarqube-scanner -f && yarn run sonar"
 
       - name: Build Container Image
         run: |
