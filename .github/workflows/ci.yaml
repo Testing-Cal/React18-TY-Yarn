@@ -56,8 +56,8 @@ jobs:
       - name: SonarQube Scan
         run: |
          
-          sed -i s+#SONAR_URL#+"${{ secrets.TENANT950174_336451CB_B0FC_45E9_9F6E_D3F1E4704A3B_SONAR }}"+g ./sonar-project.properties
-          sed -i s+#SONAR_LOGIN#+$PASSWORD+g ./sonar-project.properties
+          sed -i s+#SONAR_URL#+"$sonar_host"+g ./sonar-project.properties
+          sed -i s+#SONAR_LOGIN#+"${{ secrets.TENANT950174_336451CB_B0FC_45E9_9F6E_D3F1E4704A3B_SONAR }}"+g ./sonar-project.properties
           sed -i s+#RELEASE_NAME#+"$sonar_project_key"+g ./sonar-project.properties
           sed -i s+#SONAR_ORGANIZATION#+"$sonar_org"+g ./sonar-project.properties
           docker run --rm --user root -v "$GITHUB_WORKSPACE":/opt/repo -w /opt/repo $NODE_IMAGE /bin/bash -c "chown -R root:root /opt/repo && yarn add sonarqube-scanner -f && yarn run sonar"
