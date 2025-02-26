@@ -45,14 +45,14 @@ jobs:
           echo "ARTIFACT_HOST_SECRET=$(echo "$JSON_STRING" | jq -r '.general.ArtifactoryHostSecret')" >> "$GITHUB_ENV"
           
 
-      - name: Unit Test
-        run: |
-          docker run --rm --user root -v "$WORKSPACE":/opt/repo -w /opt/repo $NODE_IMAGE /bin/bash -c "cd /opt/repo && yarn install && yarn test -- --coverage --watchAll=false && yarn run test:coverage"
-      
       - name: Build
         run: |
           echo "no build"
 
+      - name: Unit Test
+        run: |
+          docker run --rm --user root -v "$GITHUB_WORKSPACE":/opt/repo -w /opt/repo $NODE_IMAGE /bin/bash -c "cd /opt/repo && yarn install && yarn test -- --coverage --watchAll=false && yarn run test:coverage"
+    
       - name: SonarQube Scan
         run: |
          
@@ -60,7 +60,7 @@ jobs:
           sed -i s+#SONAR_LOGIN#+$PASSWORD+g ./sonar-project.properties
           sed -i s+#RELEASE_NAME#+"$sonar_project_key"+g ./sonar-project.properties
           sed -i s+#SONAR_ORGANIZATION#+"$sonar_org"+g ./sonar-project.properties
-          docker run --rm --user root -v "$WORKSPACE":/opt/repo -w /opt/repo $NODE_IMAGE /bin/bash -c "chown -R root:root /opt/repo && yarn add sonarqube-scanner -f && yarn run sonar"
+          docker run --rm --user root -v "$GITHUB_WORKSPACE":/opt/repo -w /opt/repo $NODE_IMAGE /bin/bash -c "chown -R root:root /opt/repo && yarn add sonarqube-scanner -f && yarn run sonar"
 
       - name: Build Container Image
         run: |
