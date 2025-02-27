@@ -11,6 +11,8 @@ on:
 jobs:
   continuous-integration:
     runs-on: ubuntu-latest
+    environment:
+      name: 'Dev'
     env:
       NODE_IMAGE: "public.ecr.aws/lazsa/node:20.11.1"
       KUBECTL_IMAGE_VERSION: "bitnami/kubectl:1.28" #https://hub.docker.com/r/bitnami/kubectl/tags
