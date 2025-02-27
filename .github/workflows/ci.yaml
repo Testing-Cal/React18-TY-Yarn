@@ -1,5 +1,4 @@
-name: Continuous Integration
-
+name: CI-Dev
 on:
   workflow_dispatch:
     inputs:
