@@ -10,7 +10,7 @@ on:
 
 jobs:
   EKS-Deploy:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNNER_NAME_DEV }}
     environment:
       name: 'Dev'
       url: 'https://test.com'
@@ -27,7 +27,7 @@ jobs:
       - name: Initialization
         run: |
           sudo apt install yq -y 
-          JSON_STRING='${{ inputs.github_metadata }}'
+          JSON_STRING='${{ vars.BUILD_METADATA }}'
          
           echo "REGISTRY_URL=$(echo "$JSON_STRING" | jq -r '.general.containerImagePath')" >> "$GITHUB_ENV"
           echo "BUILD_TAG=$(echo "$JSON_STRING" | jq -r '.general.containerImageTag')"  >> "$GITHUB_ENV"
