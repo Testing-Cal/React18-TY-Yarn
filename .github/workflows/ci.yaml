@@ -10,7 +10,7 @@ on:
 
 jobs:
   continuous-integration:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNNER_NAME }}
     environment:
       name: 'Dev'
     env:
