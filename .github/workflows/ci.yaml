@@ -27,7 +27,7 @@ jobs:
           
       - name: Initialization
         run: |
-          JSON_STRING=$BUILD_METADATA
+          JSON_STRING=${{ vars.BUILD_METADATA }}
          
           echo "REGISTRY_URL=$(echo "$JSON_STRING" | jq -r '.general.containerImagePath')" >> "$GITHUB_ENV"
           echo "BUILD_TAG=${{ github.run_number }}"  >> "$GITHUB_ENV"
