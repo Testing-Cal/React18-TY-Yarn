@@ -1,6 +1,5 @@
 name: CI-Dev
-on:
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 jobs:
   continuous-integration:
