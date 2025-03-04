@@ -38,6 +38,8 @@ jobs:
           echo "ARTIFACTORY_USER_SECRET=$(echo "$JSON_STRING" | jq -r '.general.ArtifactoryUserSecret')" >> "$GITHUB_ENV"
           echo "ARTIFACTORY_PASSWORD_SECRET=$(echo "$JSON_STRING" | jq -r '.general.ArtifactoryPasswordSecret')" >> "$GITHUB_ENV"
           echo "ARTIFACT_HOST_SECRET=$(echo "$JSON_STRING" | jq -r '.general.ArtifactoryHostSecret')" >> "$GITHUB_ENV"
+          export REGISTRY_URL="$(echo "$JSON_STRING" | jq -r '.general.containerImagePath')"
+          echo "DOCKER_LOGIN_URL=$(echo "$REGISTRY_URL" | cut -d'/' -f1)" >> "$GITHUB_ENV"
           
 
       - name: Build
