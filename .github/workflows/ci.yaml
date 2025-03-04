@@ -1,11 +1,11 @@
-name: CI-Dev
+name: CI-DEV
 on: [push, workflow_dispatch]
 
 jobs:
   continuous-integration:
     runs-on: ${{ vars.RUNNER_NAME_DEV }}
     environment:
-      name: 'Dev'
+      name: Dev
     env:
       CI_IMAGE: ${{ vars.CI_IMAGE }}
       KUBECTL_IMAGE_VERSION: "bitnami/kubectl:1.28" #https://hub.docker.com/r/bitnami/kubectl/tags
@@ -52,7 +52,7 @@ jobs:
         run: |
          
           sed -i s+#SONAR_URL#+"$SONAR_HOST"+g ./sonar-project.properties
-          sed -i s+#SONAR_LOGIN#+"${{ secrets.TENANT950174_336451CB_B0FC_45E9_9F6E_D3F1E4704A3B_SONAR }}"+g ./sonar-project.properties
+          sed -i s+#SONAR_LOGIN#+"${{ secrets[env.SONAR_CREDENTIAL_ID] }}"+g ./sonar-project.properties
           sed -i s+#RELEASE_NAME#+"$SONAR_PROJECT_KEY"+g ./sonar-project.properties
           sed -i s+#SONAR_ORGANIZATION#+"$SONAR_ORG"+g ./sonar-project.properties
           cat ./sonar-project.properties
@@ -75,6 +75,7 @@ jobs:
           
       - name: Publish Container Image
         run: |
+          echo "DOCKER_LOGIN_URL=$(echo "$REGISTRY_URL" | cut -d'/' -f1)" >> "$GITHUB_ENV"
           if [[ $ARTIFACTORY == "ECR" ]]
           then
             ECR_REGION=$(echo "$REGISTRY_URL" | cut -d'.' -f4)
@@ -82,7 +83,7 @@ jobs:
             AWS_ACCESS_KEY_ID=${{ secrets[env.ARTIFACTORY_USER_SECRET] }} AWS_SECRET_ACCESS_KEY=${{ secrets[env.ARTIFACTORY_PASSWORD_SECRET] }} aws ecr get-login-password --region "$ECR_REGION" | docker login --username AWS --password-stdin $DOCKER_LOGIN_URL 
             set -x
           else
-            docker login -u ${{ secrets[env.ARTIFACTORY_USER_SECRET] }} -p ${{ secrets[env.ARTIFACTORY_PASSWORD_SECRET] }} "$REGISTRY_URL"
+            docker login -u ${{ secrets[env.ARTIFACTORY_USER_SECRET] }} -p ${{ secrets[env.ARTIFACTORY_PASSWORD_SECRET] }} "$DOCKER_LOGIN_URL"
           fi
           
           docker push "$REGISTRY_URL:$BUILD_TAG"
