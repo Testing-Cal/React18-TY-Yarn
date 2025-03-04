@@ -1,4 +1,4 @@
-name: Deploy-to-EKS-DEV
+name: Deploy-to-EKS-##ENVIRONMENT-NAME##
 
 on:
   workflow_dispatch:
@@ -12,8 +12,7 @@ jobs:
   EKS-Deploy:
     runs-on: ${{ vars.RUNNER_NAME_DEV }}
     environment:
-      name: 'Dev'
-      url: 'https://test.com'
+      name: ##ENVIRONMENT-NAME##
     env:
       KUBECTL_IMAGE_VERSION: "bitnami/kubectl:1.28" #https://hub.docker.com/r/bitnami/kubectl/tags
       HELM_IMAGE_VERSION: "alpine/helm:3.8.1" #https://hub.docker.com/r/alpine/helm/tags
